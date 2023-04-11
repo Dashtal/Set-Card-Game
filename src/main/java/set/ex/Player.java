@@ -1,5 +1,7 @@
 package set.ex;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import set.Env;
@@ -74,7 +76,7 @@ public class Player implements Runnable {
     /**
      * Queue of key presses
      */
-    private ConcurrentLinkedQueue<Integer> keyPresses;
+    private Queue<Integer> keyPresses;
 
     /**
      * The class constructor.
@@ -94,7 +96,7 @@ public class Player implements Runnable {
         this.dealer = dealer;
         state = gameState.WAITING;
         set = new ConcurrentLinkedQueue<Integer>();
-        keyPresses = new ConcurrentLinkedQueue<Integer>();
+        keyPresses = new LinkedList<Integer>();
     }
 
     /**
