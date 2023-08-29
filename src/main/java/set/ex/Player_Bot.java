@@ -8,7 +8,7 @@ public class Player_Bot extends Player {
         super(env, dealer, table, id);
     }
 
-    @Override
+    @Override 
     public void run() {
         playerThread = Thread.currentThread();
 
