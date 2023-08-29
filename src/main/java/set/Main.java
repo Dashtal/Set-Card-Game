@@ -2,6 +2,8 @@ package set;
 
 import set.ex.Dealer;
 import set.ex.Player;
+import set.ex.Player_Bot;
+import set.ex.Player_Human;
 import set.ex.Table;
 
 import java.io.File;
@@ -60,10 +62,16 @@ public class Main {
         Env env = new Env(logger, config, ui, util);
 
         // create the game entities
-        Table table = new Table(env);
+        Table table = new Table(env, players);
         dealer = new Dealer(env, table, players);
-        for (int i = 0; i < players.length; i++)
-            players[i] = new Player(env, dealer, table, i, i < env.config.humanPlayers);
+        int humanPlayers = env.config.humanPlayers;
+        for (int i = 0; i < players.length; i++) {
+            if (i < humanPlayers) {
+                players[i] = new Player_Human(env, dealer, table, i);
+            } else {
+                players[i] = new Player_Bot(env, dealer, table, i);
+            }
+        }
 
         // start the dealer thread
         ThreadLogger dealerThread = new ThreadLogger(dealer, "dealer", logger);
