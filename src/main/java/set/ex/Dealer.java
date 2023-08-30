@@ -77,10 +77,7 @@ public class Dealer implements Runnable {
         new Thread(timer).start();
 
         while (!shouldFinish()) {
-            // List of tasks to be done by dealer when resetting game table.
-            notifyAllPlayers(gameState.WAITING);
-            playersSets.clear();
-            removeAllCardsFromTable();
+            // Prepare new round.
             Collections.shuffle(deck);
             placeCardsOnTable();
             roundFinished = false;
@@ -88,6 +85,11 @@ public class Dealer implements Runnable {
             notifyAllPlayers(gameState.PLAYING);
 
             dealerLoop();
+
+            // Round finished.
+            notifyAllPlayers(gameState.WAITING);
+            playersSets.clear();
+            if (!shouldFinish()) {removeAllCardsFromTable();}
         }
         // If game finished properly and not due to an external event.
         if (!terminate) {
