@@ -162,7 +162,7 @@ public class Dealer implements Runnable {
                 for (int slot : slots) {table.removeToken(player.id, slot);} // Remove player's tokens.
             }
             table.rwLock.writeLock().unlock();
-            player.playerThread.interrupt();
+            notifyPlayer(player);
         }
     }
 
@@ -177,7 +177,7 @@ public class Dealer implements Runnable {
                     playersSets.remove(player);
                     if (player.state == gameState.WAITING) {
                         player.state = gameState.PLAYING;
-                        players[player.id].playerThread.interrupt();
+                        notifyPlayer(players[player.id]);
                     }
                 }
             }
