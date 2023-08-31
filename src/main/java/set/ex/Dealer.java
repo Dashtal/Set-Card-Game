@@ -41,7 +41,7 @@ public class Dealer implements Runnable {
     /**
      * Notifications being passed between entities through interrupting threads.
      */
-    protected Thread dealerThread;
+    protected volatile Thread dealerThread;
 
     /**
      * Indicates that round currently ongoing.
@@ -65,16 +65,33 @@ public class Dealer implements Runnable {
     }
 
     /**
+     * Initialize players threads and timer thread.
+     */
+    private void initializeGameEntities() {        
+        // Initialize players.
+        for (int i = 0; i < players.length; i++) {
+            new Thread(players[i]).start();
+            // Wait for notification from player.
+            try {
+                synchronized(this) {wait();}
+            } catch (InterruptedException playerStarted) {}
+        }
+
+        // Initialize timer.
+        new Thread(timer).start();
+        // Wait for notification from timer.
+        try {
+            synchronized(this) {wait();}
+        } catch (InterruptedException timerStarted) {}
+    }
+
+    /**
      * Initialization of the dealer thread.
      */
     @Override
     public void run() {
         dealerThread = Thread.currentThread();
-        // Initialize players threads and timer thread.
-        for (int i = 0; i < players.length; i++) {
-            new Thread(players[i]).start();
-        }
-        new Thread(timer).start();
+        initializeGameEntities();
 
         letsPlay();
         
@@ -90,19 +107,21 @@ public class Dealer implements Runnable {
      */
     private void letsPlay() {
         while (!shouldFinish()) {
+            // Round finished.
+            notifyAllPlayers(gameState.WAITING);
+            table.rwLock.writeLock().lock();
+            playersSets.clear();
+            removeAllCardsFromTable();
+
             // Prepare new round.
             Collections.shuffle(deck);
             placeCardsOnTable();
+            table.rwLock.writeLock().unlock();
             roundFinished = false;
             startTimer();
             notifyAllPlayers(gameState.PLAYING);
 
             dealerLoop();
-
-            // Round finished.
-            notifyAllPlayers(gameState.WAITING);
-            playersSets.clear();
-            if (!shouldFinish()) {removeAllCardsFromTable();}
         }
     }
 
@@ -251,7 +270,7 @@ public class Dealer implements Runnable {
         for (Player player : players) {
             player.state = state;
             player.keyInput = null;
-            player.playerThread.interrupt();
+            notifyPlayer(player);
         }
     }
 
@@ -291,5 +310,9 @@ public class Dealer implements Runnable {
 
     private void startTimer() {
         timer.timerThread.interrupt();
+    }
+
+    private void notifyPlayer(Player player) {
+        player.playerThread.interrupt();
     }
 }

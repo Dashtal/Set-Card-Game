@@ -58,7 +58,7 @@ public abstract class Player implements Runnable {
     /**
      * Notifications being passed between entities through interrupting threads.
      */
-    protected Thread playerThread;
+    protected volatile Thread playerThread;
 
     /**
      * Next play.
@@ -98,14 +98,14 @@ public abstract class Player implements Runnable {
      */
     protected void executePress() {
         table.rwLock.readLock().lock();
-        // Ignore if no card present on chosen slot.
-        if (table.slotToCard[keyInput] != null) {
-            if (table.tokens[id][keyInput] == false) {
-                table.placeToken(id, keyInput);
-            } else if (table.tokens[id][keyInput] == true) {
-                table.removeToken(id, keyInput);
+            // Ignore if no card present on chosen slot.
+            if (table.slotToCard[keyInput] != null) {
+                if (table.tokens[id][keyInput] == false) {
+                    table.placeToken(id, keyInput);
+                } else if (table.tokens[id][keyInput] == true) {
+                    table.removeToken(id, keyInput);
+                }
             }
-        }
         table.rwLock.readLock().unlock();
 
         if (setSize == 3) {
@@ -119,7 +119,7 @@ public abstract class Player implements Runnable {
     protected void checkMySet() {
         state = gameState.WAITING;
         dealer.playersSets.add(this);
-        dealer.dealerThread.interrupt();
+        notifyDealer();
         // Wait for dealer to check for legal set.
         try {
             synchronized(this) {wait();}
@@ -168,5 +168,9 @@ public abstract class Player implements Runnable {
         } else {
             state = gameState.WAITING;
         }
+    }
+
+    protected void notifyDealer() {
+        dealer.dealerThread.interrupt();
     }
 }

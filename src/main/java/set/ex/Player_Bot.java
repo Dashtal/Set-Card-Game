@@ -11,6 +11,7 @@ public class Player_Bot extends Player {
     @Override 
     public void run() {
         playerThread = Thread.currentThread();
+        notifyDealer();
 
         while (!terminate) {
             if (state == gameState.WAITING) {

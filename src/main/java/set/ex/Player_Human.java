@@ -11,6 +11,7 @@ public class Player_Human extends Player {
     @Override
     public void run() {
         playerThread = Thread.currentThread();
+        notifyDealer();
 
         while (!terminate) {
             // Wait for input

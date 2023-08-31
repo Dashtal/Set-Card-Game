@@ -17,7 +17,7 @@ public class Timer implements Runnable {
     /**
      * Notifications being passed between dealer and thread through interrupting threads.
      */
-    protected Thread timerThread;
+    protected volatile Thread timerThread;
 
     /**
      * The time when the dealer needs to reshuffle the deck due to turn timeout.
@@ -38,6 +38,7 @@ public class Timer implements Runnable {
     @Override
     public void run() {
         timerThread = Thread.currentThread();
+        notifyDealer();
 
         while (!terminate) {
             // Wait for dealer to start the timer.
@@ -50,7 +51,7 @@ public class Timer implements Runnable {
             timerLoop();
 
             dealer.roundFinished = true;
-            dealer.dealerThread.interrupt();
+            notifyDealer();
         }
     }
 
@@ -90,5 +91,9 @@ public class Timer implements Runnable {
             env.ui.setCountdown(timeLeft + 900, false);
             // + 900 for playability: displays integer part of timeLeft
         else env.ui.setCountdown(timeLeft, true);
+    }
+
+    private void notifyDealer() {
+        dealer.dealerThread.interrupt();
     }
 }
