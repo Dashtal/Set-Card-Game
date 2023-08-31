@@ -27,6 +27,6 @@ public class Player_Bot extends Player {
 
     @Override
     public void keyPressed(int slot) {
-        throw new UnsupportedOperationException("Unsupported method 'keyPressed' for Bot Player.");
+        System.out.println("Unsupported method 'keyPressed' for Bot Player.");
     }
 }
