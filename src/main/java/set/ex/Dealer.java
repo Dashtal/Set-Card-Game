@@ -76,6 +76,19 @@ public class Dealer implements Runnable {
         }
         new Thread(timer).start();
 
+        letsPlay();
+        
+        // If game finished properly and not due to an external event.
+        if (!terminate) {
+            terminate();
+            announceWinners();
+        } 
+    }
+
+    /**
+     * Main loop of the game, handled by the dealer.
+     */
+    private void letsPlay() {
         while (!shouldFinish()) {
             // Prepare new round.
             Collections.shuffle(deck);
@@ -91,11 +104,6 @@ public class Dealer implements Runnable {
             playersSets.clear();
             if (!shouldFinish()) {removeAllCardsFromTable();}
         }
-        // If game finished properly and not due to an external event.
-        if (!terminate) {
-            terminate();
-            announceWinners();
-        } 
     }
 
     /**
