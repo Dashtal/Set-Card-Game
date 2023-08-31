@@ -25,9 +25,6 @@ public class Player_Human extends Player {
         }
     }
 
-    /**
-     * This method is called by InputManager when a key is pressed.
-     */
     @Override
     public void keyPressed(int slot) {
     // Ignore if player waits for set to be checked.

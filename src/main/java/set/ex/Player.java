@@ -89,7 +89,7 @@ public abstract class Player implements Runnable {
     public abstract void run();
 
     /**
-     * This method is called when a key is pressed.
+     * This method is called by InputManager when a key is pressed.
      */
     public abstract void keyPressed(int slot);
 
